@@ -17,34 +17,51 @@ impl SafeCode {
         }
     }
 
+    fn recenter(&mut self) {
+        if self.current < 0 {
+            self.current = self.max + 1 + self.current;
+        }
+        if self.current > self.max {
+            self.current = self.current % (self.max + 1);
+        }
+    }
+
     pub fn rotate(&mut self, combination: Combination) {
-        let rotation = match combination.direction {
-            Direction::Left => -combination.amount,
-            Direction::Right => combination.amount,
-        };
+        // Part 2 solution
+
         let mut amount = combination.amount;
+        // Number of full passes, for large numbers
         if amount >= 100 {
             let passes = amount / (self.max + 1);
             amount = amount % (self.max + 1);
             self.zero_seen += passes;
         }
+
         if combination.direction == Direction::Left {
-            if self.current - amount == 0 {
+            let diff = self.current - amount;
+            // We don't want to count twice if we were already at zero
+            if diff <= 0 && self.current != 0 {
                 self.zero_seen += 1;
             }
-            if self.current - amount < 0 && self.current != 0{
-                self.zero_seen += 1;
-            }
+            self.current = diff;
 
         }
         if combination.direction == Direction::Right {
            if self.current + amount > self.max {
                 self.zero_seen += 1;
             }
+            self.current += amount;
         }
-        self.current = (self.current + rotation).rem_euclid(self.max + 1);
+        self.recenter();
 
         // Part 1 solution
+        // let rotation = match combination.direction {
+        //     Direction::Left => -combination.amount,
+        //     Direction::Right => combination.amount,
+        // };
+
+        //self.current = (self.current + rotation).rem_euclid(self.max + 1);
+
         // if self.current == 0  {
         //     println!("Hit zero!");
         //     self.zero_seen += 1;
