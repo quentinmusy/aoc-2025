@@ -22,7 +22,7 @@ impl SafeCode {
             self.current += self.max + 1;
         }
         if self.current > self.max {
-            self.current %= (self.max + 1);
+            self.current %= self.max + 1;
         }
     }
 
@@ -33,7 +33,7 @@ impl SafeCode {
         // Number of full passes, for large numbers
         if amount >= 100 {
             let passes = amount / (self.max + 1);
-            amount %= (self.max + 1);
+            amount %= self.max + 1;
             self.zero_seen += passes;
         }
 
