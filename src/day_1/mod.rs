@@ -14,4 +14,5 @@ pub fn day_1() {
         let combination = Combination::parse_from_str(line);
         safe.rotate(combination);
     }
+    println!("Result: {}", safe);
 }
