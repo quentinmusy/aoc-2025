@@ -19,10 +19,10 @@ impl SafeCode {
 
     fn recenter(&mut self) {
         if self.current < 0 {
-            self.current = self.max + 1 + self.current;
+            self.current += self.max + 1;
         }
         if self.current > self.max {
-            self.current = self.current % (self.max + 1);
+            self.current %= (self.max + 1);
         }
     }
 
@@ -33,7 +33,7 @@ impl SafeCode {
         // Number of full passes, for large numbers
         if amount >= 100 {
             let passes = amount / (self.max + 1);
-            amount = amount % (self.max + 1);
+            amount %= (self.max + 1);
             self.zero_seen += passes;
         }
 
@@ -46,12 +46,14 @@ impl SafeCode {
             self.current = diff;
 
         }
+
         if combination.direction == Direction::Right {
            if self.current + amount > self.max {
                 self.zero_seen += 1;
             }
             self.current += amount;
         }
+        
         self.recenter();
 
         // Part 1 solution
