@@ -63,7 +63,6 @@ impl SafeCode {
         //self.current = (self.current + rotation).rem_euclid(self.max + 1);
 
         // if self.current == 0  {
-        //     println!("Hit zero!");
         //     self.zero_seen += 1;
         // }
     }
