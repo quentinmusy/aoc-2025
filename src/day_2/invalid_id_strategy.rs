@@ -10,6 +10,13 @@ pub trait InvalidIdStrategy: Sized {
 pub struct Part1Strategy;
 
 impl InvalidIdStrategy for Part1Strategy {
+    /**
+     * We don't want to check every ID in the range, as ranges can be quite big,
+     * so we can try to find possible invalid IDs based on their structure.
+     * We know that invalid IDs have the same digits in both halves.
+     * So we need to look at first half of first ID and last half of last ID
+     * to find possible candidates.
+     */
     fn find_invalid_ids(self, range: Range<Self>) -> Vec<ProductId> {
         let (start_first_half, _) = range.start.get_halves(false);
         let (start_second_half, _) = range.end.get_halves(true);
@@ -35,6 +42,14 @@ impl InvalidIdStrategy for Part1Strategy {
 pub struct Part2Strategy;
 
 impl InvalidIdStrategy for Part2Strategy {
+    /**
+     * Turns out, we do need to check every ID in the range for part 2,
+     * as computing the possible invalid IDs takes even more time, or I have not found
+     * the correct way to do it.
+     * Instead we look for all possible size between 1 and half the size of the ID,
+     * and check if all parts are the same.
+     * For each id.
+     */
     fn find_invalid_ids(self, range: Range<Self>) -> Vec<ProductId> {
         let mut invalid_ids: HashSet<ProductId> = HashSet::new();
         for i in range.start.id..=range.end.id {
