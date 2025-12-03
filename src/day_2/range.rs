@@ -1,60 +1,32 @@
+use core::str;
 use std::{convert::From, fmt::Display};
-use crate::day_2::product_id::ProductId;
+use crate::day_2::{invalid_id_strategy::InvalidIdStrategy, product_id::ProductId, invalid_id_strategy::Part1Strategy};
 
-pub struct Range {
+pub struct Range<T: InvalidIdStrategy> {
     pub start: ProductId,
     pub end: ProductId,
     pub invalid_ids: Vec<ProductId>,
+    pub strategy: T,
 }
 
-impl Display for Range {
+impl<T: InvalidIdStrategy> Display for Range<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}-{}, invalids: {:?}", self.start.id, self.end.id, self.invalid_ids.iter().map(|id| id.id).collect::<Vec<u128>>())
     }
 }
 
-trait InvalidIdStrategy {
-    fn find_invalid_ids(&mut self);
-}
-
-impl Range {
-    fn new(start: ProductId, end: ProductId) -> Self {
-        Self {start, end, invalid_ids: Vec::new()}
-    }
-
-    /**
-     * We don't want to check every ID in the range, as ranges can be quite big,
-     * so we can try to find possible invalid IDs based on their structure.
-     * We know that invalid IDs have the same digits in both halves.
-     * So we need to look at first half of first ID and last half of last ID
-     * to find possible candidates.
-     */
-    pub fn find_invalid_ids(&mut self) {
-        let (start_first_half, _) = self.start.get_halves(false);
-        let (start_second_half, _) = self.end.get_halves(true);
-    
-        // Compute all possible "doubles" in the range
-        // And check if they are within the range
-        let start = start_first_half.parse::<u128>().unwrap_or(0);
-        let end = start_second_half.parse::<u128>().unwrap_or(0);
-        for half in std::cmp::min(start, end)..=std::cmp::max(start, end) {
-            let half_str = half.to_string();
-            let possible_id_str = format!("{}{}", half_str, half_str);
-            if let Ok(possible_id) = possible_id_str.parse::<u128>() {
-                if possible_id >= self.start.id && possible_id <= self.end.id {
-                    self.invalid_ids.push(ProductId::new(possible_id));
-                }
-            }
-        }
+impl<T: InvalidIdStrategy> Range<T> {
+    pub fn new(start: ProductId, end: ProductId, strategy: T) -> Self {
+        Self {start, end, invalid_ids: Vec::new(), strategy}
     }
 }
 
-impl From<&str> for Range {
+impl<T: InvalidIdStrategy + Default> From<&str> for Range<T> {
     fn from(s: &str) -> Self {
         let (start_str, end_str) = s.split_at(s.find('-').expect("Invalid range format"));
         let start_id = start_str.parse::<u128>().expect("Invalid start ID");
         let end_id = end_str[1..].parse::<u128>().expect("Invalid end ID");
-        Range::new(ProductId::new(start_id), ProductId::new(end_id))
+        Range::new(ProductId::new(start_id), ProductId::new(end_id), T::default())
     }
 }
 
@@ -70,8 +42,10 @@ mod tests {
                 let (start_number, end_number, expected) = $value;
                 let start = ProductId::new(start_number);
                 let end = ProductId::new(end_number);
-                let mut range = Range::new(start, end);
-                range.find_invalid_ids();
+                let mut range = Range::new(start, end, Part1Strategy::default());
+                let invalid_ids = range.strategy.find_invalid_ids(range);
+                range = Range::new(start, end, Part1Strategy::default());
+                range.invalid_ids = invalid_ids;
                 assert_eq!(range.invalid_ids, expected);
             }
         )*

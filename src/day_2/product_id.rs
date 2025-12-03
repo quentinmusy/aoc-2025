@@ -1,4 +1,4 @@
-#[derive(PartialEq, Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct ProductId {
     pub id: u128,
 }
@@ -19,6 +19,18 @@ impl ProductId {
         let mid = if str_id.len() % 2 == 1 && offset_odd { str_id.len() / 2  + 1} else { str_id.len() / 2  };
         let (first_half, second_half) = str_id.split_at(mid);
         (first_half.to_string(), second_half.to_string())
+    }
+
+    pub fn cut_in_sizes(&self, size: usize) -> Vec<String> {
+        let str_id = self.id.to_string();
+        let mut parts = vec![];
+        if str_id.len() % size != 0 {
+            return parts;
+        }
+        for i in (0..str_id.len()).step_by(size) {
+            parts.push(str_id[i..i+size].to_string());
+        }
+        parts
     }
 
     pub fn is_valid(&self) -> bool {
