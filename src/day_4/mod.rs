@@ -85,7 +85,6 @@ impl Map {
 
 
 pub fn day_4() {
-    println!("Day 4 not yet implemented");
     let contents = fs::read_to_string("./src/day_4/input.txt").expect("Could not read file");
     let lines: Vec<&str> = contents.lines().collect();
     let mut map = Map::from(lines);
